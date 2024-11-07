@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contagem de População em Tempo Real</title>
+  <style>
+    /* Estilos básicos */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .stat {
+      margin: 10px 0;
+      font-size: 1.5rem;
+    }
+    .stat strong {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>População Mundial em Tempo Real</h1>
+    <div class="stat">População Atual: <strong id="population">0</strong></div>
+    <div class="stat">Mortes este ano: <strong id="yearly-deaths">0</strong></div>
+    <div class="stat">Mortes hoje: <strong id="daily-deaths">0</strong></div>
+    <div class="stat">Nascimentos este ano: <strong id="yearly-births">0</strong></div>
+    <div class="stat">Nascimentos hoje: <strong id="daily-births">0</strong></div>
+  </div>
+
+  <script>
+    // Constantes das taxas
+    const INITIAL_POPULATION = 8000000000;
+    const ANNUAL_DEATHS = 61600000;
+    const DAILY_DEATHS = ANNUAL_DEATHS / 365;
+    const DEATHS_PER_SECOND = DAILY_DEATHS / 86400;
+
+    const ANNUAL_BIRTHS = 148000000;
+    const DAILY_BIRTHS = ANNUAL_BIRTHS / 365;
+    const BIRTHS_PER_SECOND = DAILY_BIRTHS / 86400;
+
+    // Elementos do DOM para exibir os dados
+    const populationEl = document.getElementById('population');
+    const yearlyDeathsEl = document.getElementById('yearly-deaths');
+    const dailyDeathsEl = document.getElementById('daily-deaths');
+    const yearlyBirthsEl = document.getElementById('yearly-births');
+    const dailyBirthsEl = document.getElementById('daily-births');
+
+    // Função para atualizar os dados em tempo real
+    function updateStats() {
+      const now = Date.now();
+
+      // Datas de início do ano e do dia
+      const startOfYear = new Date(new Date().getFullYear(), 0, 1).getTime();
+      const startOfDay = new Date().setHours(0, 0, 0, 0);
+
+      // Cálculo das mortes e nascimentos
+      const secondsSinceYearStart = (now - startOfYear) / 1000;
+      const deathsThisYear = secondsSinceYearStart * DEATHS_PER_SECOND;
+      const birthsThisYear = secondsSinceYearStart * BIRTHS_PER_SECOND;
+
+      const secondsSinceDayStart = (now - startOfDay) / 1000;
+      const deathsToday = secondsSinceDayStart * DEATHS_PER_SECOND;
+      const birthsToday = secondsSinceDayStart * BIRTHS_PER_SECOND;
+
+      // População atual estimada
+      const currentPopulation = INITIAL_POPULATION + (birthsThisYear - deathsThisYear);
+
+      // Atualizando os valores no DOM
+      populationEl.textContent = currentPopulation.toLocaleString();
+      yearlyDeathsEl.textContent = deathsThisYear.toLocaleString();
+      dailyDeathsEl.textContent = deathsToday.toLocaleString();
+      yearlyBirthsEl.textContent = birthsThisYear.toLocaleString();
+      dailyBirthsEl.textContent = birthsToday.toLocaleString();
+    }
+
+    // Atualizar as estatísticas a cada segundo
+    updateStats();
+    setInterval(updateStats, 1000);
+  </script>
+</body>
+</html>
